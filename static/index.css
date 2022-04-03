@@ -1,0 +1,23 @@
+.form-container{
+    display: flex;
+    flex-direction: column;
+    background-color: brown;
+    height: max-content;
+    padding: 5rem 8rem;
+    border-radius: 0.9rem;
+}
+.form-elem{
+    background-color: chocolate;
+    padding: 3rem 5rem;
+    font-size: 3rem;
+    border-radius: 0.5rem;
+    box-shadow: 0.2rem 0.2rem 0.2rem 0.2rem rgb(102, 37, 37);
+    color: rgb(255, 204, 204);
+    text-decoration: none;
+}
+.form-elem:active{
+    background-color: rgb(206, 29, 73);
+}
+.form-elem + .form-elem{
+    margin-top: 3rem;
+}

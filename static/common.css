@@ -1,0 +1,23 @@
+*{
+    box-sizing: border-box;
+}
+
+body{
+    margin: 0;
+    padding: 0;
+}
+
+.body-container{
+    display: flex;
+    flex-direction: column;
+    background-color: blueviolet;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+}
+
+.body-container h2{
+    background-color: khaki;
+    color: red;
+    padding: 1em 0.5em;
+}

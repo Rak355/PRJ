@@ -1,0 +1,25 @@
+.body-child + .body-child{
+    margin-top: 5em;
+}
+
+.add-table {
+    max-width: 100%;
+}
+
+.add-table td {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-container {
+    width: 100vw;
+    overflow: auto;
+}
+
+#myTable {
+    max-width: 100vw;
+}
+
+#myTable input {
+    max-width: 7em;
+}

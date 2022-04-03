@@ -1,0 +1,316 @@
+<html>
+    <head>
+        <title>main page</title>
+        <link rel="stylesheet" href="{{url_for('static', filename='common.css')}}">
+        <link rel="stylesheet" href="{{url_for('static', filename='main.css')}}">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    </head>
+    <body>
+        <div class="body-container">
+            <div class="body-child">
+                <a href="/logout"><button>logout</button></a>
+            </div>
+            <div class="body-child">
+                <table class="add-table" style="width: 100%;">
+                    <thead>
+                        <th>Enter details of new Company</th>
+                    </thead>
+                    <tr>
+                        <td><input id="add_A" type="text" placeholder="name" required></input></td>
+                        <td><input id="add_B" type="text" placeholder="website" required></input></td>
+                    </tr>
+                    <tr>
+                        <td><input id="add_C" type="text" placeholder="phone number" required></input></td>
+                        <td><input id="add_D" type="text" placeholder="address" required></input></td>
+                    </tr>
+                    <tr>
+                        <td><input id="add_E" type="text" placeholder="city" required></input></td>
+                        <td><input id="add_F" type="text" placeholder="state" required></input></td>
+                    </tr>
+                    <tr>    
+                        <td><input id="add_G" type="text" placeholder="country" required></input></td>
+                        <td>
+                            <select id="add_H" name="industry" style="width: 100%;">
+                                <option value="Account">Account</option>
+                                <option value="IT">IT</option>
+                                <option value="Sales">Sales</option>                                    
+                                <option value="Health Care">Health Care</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><button id="add_btn" onclick="add()">Add</button></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="body-child table-container">
+                <table id="myTable" class="display">
+                    <thead>
+                        <tr>
+                            <th>name</th>
+                            <th>website</th>
+                            <th>phone number</th>
+                            <th>address</th>
+                            <th>city</th>
+                            <th>state</th>
+                            <th>country</th>
+                            <th>industry</th>
+                            <th>controls</th>
+                    </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>name</th>
+                            <th>website</th>
+                            <th>phone number</th>
+                            <th>address</th>
+                            <th>city</th>
+                            <th>state</th>
+                            <th>country</th>
+                            <th>industry</th>
+                            <th>controls</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.js"></script>
+    <script src="https://cdn.datatables.net/plug-ins/1.10.15/api/row().show().js"></script>
+    <script type="text/javascript">
+        // datatable table
+        var table = $('#myTable').DataTable();
+        // populate datatable with data
+        $(document).ready( function (e) {
+            $.ajax({
+                type: 'POST',
+                url: "{{url_for('main')}}",
+                data: {'value': 'load_table'},
+                success: function (response) {
+                    console.log(response);
+                    populateDataTable(response);
+                },
+                error: function (e) {
+                    console.log("There was an error with your request...");
+                    console.log("error: " + JSON.stringify(e));
+                }
+            });
+        });
+
+        // helper function to populate datatable
+        function populateDataTable(response){
+            console.log("populating data table");
+            
+            // clear the datatable first
+            $("#myTable").DataTable().clear();
+            var length = Object.keys(response.data).length;
+            
+            // then, add each row to the table 
+            for(var i=0; i<length; i++){
+                var company = response.data[i];
+                console.log(company);
+                var row_index = $('#myTable').dataTable().fnAddData([
+                    company[0], //company name
+                    company[1], //website
+                    company[2], //phone number
+                    company[3], //address
+                    company[4], //city
+                    company[5], //state
+                    company[6], //country
+                    company[7], //industry
+                    company[8], //controls
+                ]);
+                // add an id attribute to each row element
+                // id would be same as company's name
+                var row = $("#myTable").dataTable().fnGetNodes(row_index);
+                $(row).attr("id",company[0]);
+            }
+        }
+
+        // helper function, triggered after clicking edit button
+        // id is the company's name
+        function edit(id){
+            console.log('eter');
+            console.log('edit:', id);
+            
+            // get the row with id 'i'
+            row = document.getElementById(id);
+            
+            // get childrens list of the row element
+            children = row.children;
+
+            // get the individual childrens elements
+            name_elem = children[0];
+            website_elem = children[1];
+            phoneno_elem = children[2];
+            address_elem = children[3];
+            city_elem = children[4];
+            state_elem = children[5];
+            country_elem = children[6];
+            industry_elem = children[7];
+
+            control_elem = children[8];
+
+            // retrieve the initial values of the fields
+            initial_cname = name_elem.innerHTML;
+            initial_website = website_elem.innerHTML;
+            initial_phoneno = phoneno_elem.innerHTML;
+            initial_address = address_elem.innerHTML;
+            initial_city = city_elem.innerHTML;
+            initial_state = state_elem.innerHTML;
+            initial_country = country_elem.innerHTML;
+            initial_industry = industry_elem.innerHTML;
+
+            
+            // modify the fields into input elements
+            name_elem.innerHTML = '<input id="inputA'+ id +'" type="text" value="'+ initial_cname +'">';
+            website_elem.innerHTML = '<input id="inputB'+ id +'" type="text" value="'+ initial_website +'">';
+            phoneno_elem.innerHTML = '<input id="inputC'+ id +'" type="text" value="'+ initial_phoneno +'">';
+            address_elem.innerHTML = '<input id="inputD'+ id +'" type="text" value="'+ initial_address +'">';
+            city_elem.innerHTML = '<input id="inputE'+ id +'" type="text" value="'+ initial_city +'">';
+            state_elem.innerHTML = '<input id="inputF'+ id +'" type="text" value="'+ initial_state +'">';
+            country_elem.innerHTML = '<input id="inputG'+ id +'" type="text" value="'+ initial_country +'">';
+            industry_elem.innerHTML = '<select id="inputH'+ id + '" name="industry" style="width: 100%;" value="'+ initial_industry +'">'
+                               + '<option value="Account">Account</option>'
+                               + '<option value="IT">IT</option>' 
+                               + '<option value="Sales">Sales</option>'                                    
+                               + '<option value="Health Care">Health Care</option>'
+                               + '</select>'
+
+            document.getElementById("myTable").setAttribute("max-width","100vw");
+
+
+            // modify the buttons for final submission or rejection
+            control_elem.outerHTML = '<td><button id="submit'+ id +'" onclick=submit_edit("'+ id +'")>submit</button><button id="cancel'+ id +'" onclick=restore_edit("'+ id +'")>cancel</button></td>';
+        }
+
+        // helper function, triggered after clicking delete button
+        // id is the company's name
+        function del(id){
+            console.log('delete:', id)
+            // send request to server to delete the document with same id
+            $.ajax({
+                type: 'POST',
+                url: "{{url_for('main')}}",
+                data: {'value': 'delete_row', 'i': id},
+                success: function (response) {
+                    console.log(response);
+                    populateDataTable(response);
+                },
+                error: function (e) {
+                    console.log("There was an error with your request...");
+                    console.log("error: " + JSON.stringify(e));
+                }
+            });
+        }
+        
+        // helper function, triggered after clicking submit button within edit operation
+        // id is the company's name
+        function submit_edit(id){
+            // get the input elements value
+            cname = document.getElementById('inputA'+id).value;
+            website = document.getElementById('inputB'+id).value;
+            phoneno = document.getElementById('inputC'+id).value;
+            address = document.getElementById('inputD'+id).value;
+            city = document.getElementById('inputE'+id).value;
+            state = document.getElementById('inputF'+id).value;
+            country = document.getElementById('inputG'+id).value;
+            industry = document.getElementById('inputH'+id).value;
+
+            if(cname === null || cname === ""){
+                alert("invalid name");
+                return 0;
+            }
+            
+            // send a request to server to edit the document with new data
+            $.ajax({
+                type: 'POST',
+                url: "{{url_for('main')}}",
+                data: {
+                    'value': 'edit_row', 
+                    'i': id, 
+                    'name': cname,
+                    'website': website,
+                    'phoneno': phoneno,
+                    'address': address,
+                    'city': city,
+                    'state': state,
+                    'country': country,
+                    'industry': industry
+                },
+                success: function (response) {
+                    if(response === 'company already exists'){
+                        alert(response);
+                    }else{
+                        console.log(response);
+                        populateDataTable(response);
+                    }
+                },
+                error: function (e) {
+                    console.log("There was an error with your request...");
+                    console.log("error: " + JSON.stringify(e));
+                }
+            });
+        }
+
+        function restore_edit(i){
+            $.ajax({
+                type: 'POST',
+                url: "{{url_for('main')}}",
+                data: {'value': 'load_table'},
+                success: function (response) {
+                    console.log(response);
+                    populateDataTable(response);
+                },
+                error: function (e) {
+                    console.log("There was an error with your request...");
+                    console.log("error: " + JSON.stringify(e));
+                }
+            });
+        }
+
+        function add(){
+            A_val = document.getElementById('add_A').value;
+            B_val = document.getElementById('add_B').value;
+            C_val = document.getElementById('add_C').value;
+            D_val = document.getElementById('add_D').value;
+            E_val = document.getElementById('add_E').value;
+            F_val = document.getElementById('add_F').value;
+            G_val = document.getElementById('add_G').value;
+            H_val = document.getElementById('add_H').value;
+
+            if(A_val === null || A_val === ""){
+                alert("invalid name");
+                return 0;
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: "{{url_for('main')}}",
+                data: {
+                    'value': 'add_row',
+                    'name': A_val,
+                    'website': B_val,
+                    'phoneno': C_val,
+                    'address': D_val,
+                    'city': E_val,
+                    'state': F_val,
+                    'country': G_val,
+                    'industry': H_val
+                },
+                success: function (response) {
+                    console.log(response);
+                    populateDataTable(response);
+                },
+                error: function (e) {
+                    console.log("There was an error with your request...");
+                    console.log("error: " + JSON.stringify(e));
+                }
+            });
+        }
+    </script>
+    </body>
+</html>

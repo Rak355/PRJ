@@ -1,0 +1,11 @@
+form{
+    color: white;
+    background-color: brown;
+    border-radius: 0.5rem;
+}
+form h1{
+    padding: 3rem 0 0rem 3rem;
+}
+.ctrl-container{
+    padding: 3rem 5rem;
+}
